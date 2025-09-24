@@ -11,63 +11,121 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
     }
+
+    /* Navbar */
     .navbar {
       background-color: #2e7d32;
-      border-radius: 10px;
-      padding: 12px 20px;
+      border-radius: 14px;
+      padding: 14px 22px;
       margin-bottom: 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
     }
     .navbar a {
       color: white;
       font-weight: 600;
-      margin-left: 15px;
+      margin-left: 18px;
       text-decoration: none;
+      transition: 0.2s;
     }
     .navbar a:hover { text-decoration: underline; }
-    h1 { color: #2e7d32; font-weight: bold; margin-bottom: 20px; text-align: center; }
+
+    /* Title */
+    h1 {
+      color: #1b5e20;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Carousel Items */
     .carousel-item {
       background: white;
       border-radius: 15px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0px 4px 12px rgba(0,128,0,0.2);
       text-align: center;
+      min-height: 300px;
+      transition: all 0.3s ease;
+    }
+    .carousel-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 8px 20px rgba(0,128,0,0.25);
     }
     .carousel-item img {
       border-radius: 10px;
-      max-width: 80%;
+      max-width: 60%;
       margin: 10px auto;
+      transition: 0.3s ease;
     }
+
+    /* Featured Badge */
     .featured {
       background: gold;
       color: #333;
       font-size: 14px;
       font-weight: bold;
-      padding: 2px 8px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      margin-left: 10px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
     }
+
+    /* Buttons */
     .btn-claim {
       background-color: #2e7d32;
       color: white;
-      border-radius: 10px;
-      padding: 8px 16px;
+      border-radius: 12px;
+      padding: 6px 14px;
       border: none;
-      transition: 0.3s ease;
-      margin-top: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      margin-top: 8px;
     }
-    .btn-claim:hover { background-color: #1b5e20; }
-    .claimed { color: #2e7d32; font-weight: bold; margin-top: 10px; }
-    .countdown { font-weight: bold; color: #e53935; margin: 8px 0; }
+    .btn-claim:hover { 
+      background-color: #1b5e20; 
+      transform: scale(1.05); 
+    }
+     
+    .btn-outline-success {
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    /* Text */
+    .claimed {
+      color: #2e7d32;
+      font-weight: bold;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    .countdown {
+      font-weight: bold;
+      color: #e53935;
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    /* Carousel Controls */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      filter: invert(1) grayscale(100);
+    }
   </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <div class="navbar">
-  <div><a href="/">🍏 Fruit Drops</a></div>
-  <div><a href="/auth/profile">Profile</a> <a href="/auth/login">Logout</a></div>
+  <div><a href="/">Fruit Drops</a></div>
+  <div><a href="/auth/profile">Profile</a> <a href="/api/auth/logout">Logout</a></div>
 </div>
 
 <h1>Active Fruit Drops</h1>
@@ -81,13 +139,26 @@
         <h2>
           <%= drop.title %>
           <% if(drop.featured){ %>
-            <span class="featured">⭐ Featured</span>
+            <span class="featured">Featured</span>
           <% } %>
         </h2>
         <p><%= drop.description %></p>
+
         <% if(drop.image){ %>
           <img src="<%= drop.image %>" alt="Fruit Image">
         <% } %>
+
+        <!-- Price (Discounted only for members) -->
+        <p><strong>Price:</strong>
+          <% if(user.isMember){ %>
+            ₹<%= drop.finalPrice.toFixed(2) %>
+            <% if(drop.discount){ %>
+              <small>(<%= drop.discount %>% off)</small>
+            <% } %>
+          <% } else { %>
+            <em>Membership required to see price</em>
+          <% } %>
+        </p>
 
         <!-- Countdown -->
         <p class="countdown" id="countdown-<%= drop._id %>">Loading countdown...</p>
@@ -95,15 +166,19 @@
         <p><strong>Ends at:</strong> <%= drop.endTime.toLocaleString() %></p>
 
         <!-- View Details -->
-        <a href="/drops/<%= drop._id %>" class="btn btn-outline-success btn-sm mb-2">📄 View Details</a><br>
+        <a href="/drops/<%= drop._id %>" class="btn btn-outline-success btn-sm mb-2"> View Details</a><br>
 
         <!-- Claim Button -->
-        <% if(!drop.claimedBy.includes(user._id)){ %>
-          <form method="POST" action="/drops/<%= drop._id %>/claim">
-            <button type="submit" class="btn-claim">Claim Drop</button>
-          </form>
+        <% if(user.isMember){ %>
+          <% if(!drop.alreadyClaimed){ %>
+            <form method="POST" action="/drops/<%= drop._id %>/claim">
+              <button type="submit" class="btn-claim">Claim Drop</button>
+            </form>
+          <% } else { %>
+            <p class="claimed">✅ Claimed</p>
+          <% } %>
         <% } else { %>
-          <p class="claimed">✅ Claimed</p>
+          <p><em>Membership required to claim this drop.</em></p>
         <% } %>
       </div>
     <% }) %>
@@ -136,7 +211,8 @@
       const distance = endTime - now;
 
       if (distance <= 0) {
-        countdownEl.innerHTML = "⏳ Drop Ended";
+        countdownEl.innerHTML = " Drop Ended";
+        countdownEl.style.color = "#777";
         return;
       }
 
@@ -144,7 +220,7 @@
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      countdownEl.innerHTML = `⏳ Time left: ${hours}h ${minutes}m ${seconds}s`;
+      countdownEl.innerHTML = `⏳ ${hours}h ${minutes}m ${seconds}s left`;
     }
 
     updateCountdown();

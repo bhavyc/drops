@@ -26,9 +26,7 @@
       margin-left: 15px;
       text-decoration: none;
     }
-    .navbar a:hover {
-      text-decoration: underline;
-    }
+    .navbar a:hover { text-decoration: underline; }
     .drop-card {
       background: white;
       padding: 30px;
@@ -38,15 +36,8 @@
       margin: auto;
       text-align: center;
     }
-    h1 {
-      color: #2e7d32;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .info {
-      font-size: 18px;
-      margin: 8px 0;
-    }
+    h1 { color: #2e7d32; font-weight: bold; margin-bottom: 15px; }
+    .info { font-size: 18px; margin: 8px 0; }
     .btn-claim {
       background-color: #2e7d32;
       color: white;
@@ -58,15 +49,8 @@
       margin-top: 20px;
       transition: 0.3s ease;
     }
-    .btn-claim:hover {
-      background-color: #1b5e20;
-    }
-    .claimed {
-      color: #2e7d32;
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
+    .btn-claim:hover { background-color: #1b5e20; }
+    .claimed { color: #2e7d32; font-size: 18px; font-weight: bold; margin-top: 20px; }
     .back-link {
       display: inline-block;
       margin-top: 25px;
@@ -74,21 +58,15 @@
       font-weight: bold;
       color: #2e7d32;
     }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    .back-link:hover { text-decoration: underline; }
+    .membership-note { color: #e53935; font-style: italic; margin-top: 15px; }
   </style>
 </head>
 <body>
   <!-- Navbar -->
   <div class="navbar">
-    <div>
-      <a href="/">🍏 Fruit Drops</a>
-    </div>
-    <div>
-      <a href="/auth/profile">Profile</a>
-      <a href="/auth/login">Logout</a>
-    </div>
+    <div><a href="/">🍏 Fruit Drops</a></div>
+    <div><a href="/auth/profile">Profile</a> <a href="/api/auth/logout">Logout</a></div>
   </div>
 
   <!-- Drop Details Card -->
@@ -96,16 +74,27 @@
     <h1><%= drop.title %></h1>
     <p class="info"><%= drop.description %></p>
 
+    <!-- Price & Discount -->
+    <p class="info">💰 <strong>Price:</strong> ₹<%= finalPrice.toFixed(2) %></p>
+    <% if(!user.isMember){ %>
+      <p class="membership-note">Become a member to get a 20% discount!</p>
+    <% } %>
+
     <p class="info">⏳ <strong>Starts:</strong> <%= drop.startTime.toLocaleString() %></p>
     <p class="info">⏳ <strong>Ends:</strong> <%= drop.endTime.toLocaleString() %></p>
     <p class="info">👥 <strong>Total Claims:</strong> <%= totalClaims %></p>
 
-    <% if (alreadyClaimed) { %>
-      <p class="claimed">✅ You already claimed this drop</p>
+    <!-- Claim Button -->
+    <% if(user.isMember){ %>
+      <% if(alreadyClaimed){ %>
+        <p class="claimed">✅ You already claimed this drop</p>
+      <% } else { %>
+        <form action="/drops/<%= drop._id %>/claim" method="POST">
+          <button type="submit" class="btn-claim">Claim Drop</button>
+        </form>
+      <% } %>
     <% } else { %>
-      <form action="/drops/<%= drop._id %>/claim" method="POST">
-        <button type="submit" class="btn-claim">Claim Drop</button>
-      </form>
+      <p class="membership-note">Only members can claim drops. Join now!</p>
     <% } %>
 
     <a href="/drops" class="back-link">⬅ Back to all drops</a>

@@ -5,7 +5,8 @@ const {
   register,
   showLogin,
   login,
-  getProfile
+  getProfile,
+  logout
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -17,5 +18,6 @@ router.get("/profile", protect, getProfile);
 // Form routes
 router.post("/register", register);
 router.post("/login", login);
+router.post("/logout", logout);
 
 module.exports = router;

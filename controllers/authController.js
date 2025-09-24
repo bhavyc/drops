@@ -43,8 +43,13 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.render("auth/login", { error: "Invalid credentials" });
 
+    if (!user) return res.render("auth/login", { error: "Invalid credentials" });
+console.log(user)
+     if(user.role==="admin"){
+     
+      return res.render("auth/login", { error: "Admins must use the admin login page" });
+     }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.render("auth/login", { error: "Invalid credentials" });
 
@@ -55,8 +60,7 @@ exports.login = async (req, res) => {
     res.render("auth/login", { error: err.message });
   }
 };
-
-// Render profile page (protected)
+ 
 exports.getProfile = async (req, res) => {
   try {
     // Get all claims by this user and populate drop details
@@ -64,12 +68,22 @@ exports.getProfile = async (req, res) => {
                               .populate("drop")  // get full drop info
                               .sort({ claimedAt: -1 }); // latest first
 
+    // Remove claims where drop is null
+    const validClaims = claims.filter(claim => claim.drop);
+
     res.render("auth/profile", { 
       user: req.user,
-      claimedDrops: claims 
+      claimedDrops: validClaims 
     });
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.send("Error loading profile: " + err.message);
   }
 };
+
+exports.logout = (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/api/auth/login");
+};
+
+ 

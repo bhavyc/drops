@@ -21,7 +21,7 @@
       border-radius: 20px;
       box-shadow: 0px 4px 15px rgba(0, 128, 0, 0.2);
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
     }
     h1 {
       color: #2e7d32;
@@ -53,15 +53,31 @@
       color: #777;
       font-style: italic;
     }
+    .btn-buy {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="profile-box">
-    <h1>🍏 Welcome, <%= user.name %></h1>
+    <h1>Welcome, <%= user.name %></h1>
+
+    <!-- User Info + Membership -->
     <div class="user-info">
       <p><strong>Email:</strong> <%= user.email %></p>
+      <p><strong>Membership:</strong> 
+        <% if(user.isMember){ %>
+          Active (expires on <%= user.membershipExpiry ? user.membershipExpiry.toLocaleDateString() : "N/A" %>)
+        <% } else { %>
+          Not Active
+          <form action="/membership/buy" method="POST" style="display:inline;">
+            <button class="btn btn-sm btn-success btn-buy">Buy Membership</button>
+          </form>
+        <% } %>
+      </p>
     </div>
 
+    <!-- Claimed Drops -->
     <h2>Claimed Drops</h2>
     <% if(claimedDrops.length === 0){ %>
       <p class="no-drops">You haven't claimed any drops yet.</p>
@@ -70,11 +86,20 @@
         <% claimedDrops.forEach(claim => { %>
           <li>
             <strong><%= claim.drop.title %></strong><br>
+            <%= claim.drop.description ? claim.drop.description : "" %><br>
+            <% if(user.isMember){ %>
+              Price: ₹<%= claim.drop.price %><br>
+            <% } %>
             <small>Claimed at: <%= claim.claimedAt.toLocaleString() %></small>
           </li>
         <% }) %>
       </ul>
     <% } %>
+
+    <!-- Logout -->
+    <form action="/api/auth/logout" method="POST" class="mt-3">
+      <button class="btn btn-danger">Logout</button>
+    </form>
   </div>
 </body>
 </html>

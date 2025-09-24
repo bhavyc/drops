@@ -1,56 +1,56 @@
 const mongoose = require("mongoose");
-const Drop = require("./models/FruitDrop");
-const Claim = require("./models/Claim");
+const Drop = require("./models/FruitDrop"); // apna path check karo
 
-mongoose.connect("mongodb://127.0.0.1:27017/drop", {
+// DB Connection
+mongoose.connect("mongodb://localhost:27017/drop", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+}).then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
 
 const drops = [
   {
-    title: "Mango Madness",
-    description: "Get the juiciest Alphonso mangoes fresh from Ratnagiri!",
-    image: "https://picsum.photos/seed/mango/400/250",
-    startTime: new Date(Date.now()), // available now
-    endTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours later
+    title: "Fresh Mangoes",
+    description: "Get fresh Alphonso mangoes from Maharashtra.",
+    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",  
+    startTime: new Date("2025-09-15T10:00:00Z"),
+    endTime: new Date("2025-09-20T18:00:00Z"),
     featured: true,
+    price: 499,
+    claimedBy: [],
   },
   {
-    title: "Apple Fiesta",
-    description: "Crispy Kashmiri apples at half the price!",
-    image: "https://picsum.photos/seed/apple/400/250",
-    startTime: new Date(Date.now() + 1 * 60 * 60 * 1000), // starts in 1h
-    endTime: new Date(Date.now() + 4 * 60 * 60 * 1000), // ends in 4h
+    title: "Organic Apples",
+    description: "Red delicious apples, straight from Himachal.",
+    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",  
+    startTime: new Date("2025-09-16T09:00:00Z"),
+    endTime: new Date("2025-09-22T20:00:00Z"),
     featured: false,
+    price: 299,
+    claimedBy: [],
   },
   {
-    title: "Banana Bonanza",
-    description: "Organic bananas rich in potassium and vitamins.",
-    image: "https://picsum.photos/seed/banana/400/250",
-    startTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // started 2h ago
-    endTime: new Date(Date.now() + 3 * 60 * 60 * 1000), // ends in 3h
-    featured: true,
-  },
-  {
-    title: "Grapes Galaxy",
-    description: "Sweet green grapes directly from Nashik farms.",
-    image: "https://picsum.photos/seed/grapes/400/250",
-    startTime: new Date(Date.now() + 30 * 60 * 1000), // starts in 30 min
-    endTime: new Date(Date.now() + 5 * 60 * 60 * 1000), // ends in 5h
+    title: "Fresh Bananas",
+    description: "Sweet bananas from Kerala farms.",
+    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",    
+    startTime: new Date("2025-09-17T08:00:00Z"),
+    endTime: new Date("2025-09-23T19:00:00Z"),
     featured: false,
-  },
+    price: 149,
+    claimedBy: [],
+  }
 ];
 
-async function seed() {
+// Seed Function
+const seedDrops = async () => {
   try {
-    await Drop.deleteMany({});
+    await Drop.deleteMany(); // purane drops delete kar de (optional)
     await Drop.insertMany(drops);
     console.log("Drops seeded successfully!");
-    mongoose.connection.close();
+    mongoose.disconnect();
   } catch (err) {
-    console.error("Seeding error:", err);
+    console.log("Seeder error:", err);
   }
-}
+};
 
-seed();
+seedDrops();

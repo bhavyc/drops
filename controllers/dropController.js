@@ -1,36 +1,65 @@
 const Drop = require("../models/FruitDrop");
 const Claim = require("../models/Claim");
-// List active drops
+const dis=20;
+
+
 exports.listDrops = async (req, res) => {
   try {
     const now = new Date();
     const drops = await Drop.find({ endTime: { $gt: now } }).sort({ startTime: 1 });
-    res.render("drop/drops", { drops, user: req.user });
-  } catch (err) {
+
+    const isMember = req.user?.isMember && req.user.membershipExpiry > now;
+
+    // Calculate discounted price only for members
+    const dropsWithPrice = drops.map(drop => {
+      let finalPrice = drop.price;
+      if(isMember && drop.discount) {
+        finalPrice = drop.price - (drop.price * drop.discount / 100);
+      }
+
+      // Check if user already claimed
+      const alreadyClaimed = drop.claimedBy?.some(
+        id => id.toString() === req.user._id.toString()
+      );
+
+      return {
+        ...drop.toObject(),
+        finalPrice,
+        alreadyClaimed
+      };
+    });
+
+    res.render("drop/drops", { drops: dropsWithPrice, user: req.user, isMember });
+  } catch(err) {
+    console.error(err);
     res.send("Error: " + err.message);
   }
 };
 
+// Show single drop details
 // Show single drop details
 exports.showDrop = async (req, res) => {
   try {
     const drop = await Drop.findById(req.params.id);
     if (!drop) return res.send("Drop not found");
 
-    // Check if this user already claimed this drop
-    const alreadyClaimed = await Claim.findOne({
-      user: req.user._id,
-      drop: drop._id,
-    });
-
-    // Count total claims for this drop
     const totalClaims = await Claim.countDocuments({ drop: drop._id });
+    const alreadyClaimed = await Claim.findOne({ user: req.user._id, drop: drop._id });
+
+    const isMember = req.user.isMember && req.user.membershipExpiry > new Date();
+
+    // Use drop-specific discount
+    const finalPrice = isMember 
+      ? drop.price * (1 - (drop.discount / 100)) 
+      : drop.price;
 
     res.render("drop/dropDetail", {
       drop,
       user: req.user,
       alreadyClaimed: !!alreadyClaimed,
+      isMember,
       totalClaims,
+      finalPrice // pass this to EJS
     });
   } catch (err) {
     console.error("Error in showDrop:", err);
@@ -38,35 +67,92 @@ exports.showDrop = async (req, res) => {
   }
 };
 
+// Claim drop (members only)
+// exports.claimDrop = async (req, res) => {
+//   try {
+//     const user = req.user;
 
-// Claim drop
+//     // Membership check
+//     if(!user.isMember || user.membershipExpiry < new Date()) {
+//       return res.send("You need an active membership to claim this drop");
+//     }
+
+//     const dropId = req.params.id;
+//     const drop = await Drop.findById(dropId);
+//     if(!drop) return res.send("Drop not found");
+
+//     // Create claim
+//     try {
+//       await Claim.create({ user: user._id, drop: dropId });
+//     } catch(err) {
+//       if(err.code === 11000) return res.send("You already claimed this drop");
+//       throw err;
+//     }
+
+//     res.redirect("/drops");
+//   } catch(err) {
+//     console.error("Claim error:", err);
+//     res.send("Error claiming drop: " + err.message);
+//   }
+// };
+
+
 exports.claimDrop = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const dropId = req.params.id;
+    const user = req.user;
 
-    // Check if drop exists
+    if (!user.isMember || user.membershipExpiry < new Date()) {
+      return res.json({ success: false, message: "You need an active membership to claim this drop" });
+    }
+
+    const dropId = req.params.id;
     const drop = await Drop.findById(dropId);
-    if (!drop) return res.send("Drop not found");
+    if (!drop) return res.json({ success: false, message: "Drop not found" });
 
     // Create claim
     try {
-      await Claim.create({ user: userId, drop: dropId });
-      console.log(`User ${userId} claimed drop ${dropId}`);
+      await Claim.create({ user: user._id, drop: dropId });
     } catch (err) {
-      // Handle duplicate claim
-      if (err.code === 11000) {
-        return res.send("You already claimed this drop");
-      }
+      if (err.code === 11000) return res.json({ success: false, message: "You already claimed this drop" });
       throw err;
     }
 
-    res.redirect("/drops");
+    // Emit only to this user
+    const io = req.app.get("io");
+    io.to(user._id.toString()).emit("claimUpdate", {
+      dropId,
+      message: "You claimed this drop successfully!"
+    });
+
+    res.json({ success: true, message: "Drop claimed!" });
   } catch (err) {
     console.error("Claim error:", err);
-    res.send("Error claiming drop: " + err.message);
+    res.json({ success: false, message: "Error claiming drop: " + err.message });
   }
 };
 
+// Show add drop form (admin)
+exports.showAddDrop = (req, res) => {
+  res.render("drop/addDrop", { error: null, user: req.user });
+};
 
-
+// Handle add drop (admin)
+exports.addDrop = async (req, res) => {
+  const { title, description, image, startTime, endTime, price, featured } = req.body;
+  try {
+    const newDrop = new Drop({
+      title,
+      description,
+      image,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
+      price: price || 0,
+      featured: featured === "on" ? true : false,
+    });
+    await newDrop.save();
+    res.redirect("/drops");
+  } catch (err) {
+    console.error("Add Drop error:", err);
+    res.render("drop/addDrop", {error: err.message, user: req.user });
+  }
+};

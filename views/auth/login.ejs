@@ -62,11 +62,9 @@
 </head>
 <body>
   <div class="login-box">
-    <h1>🍏 Login</h1>
+    <h1> Login</h1>
     
-    <% if(error) { %>
-      <p class="error-msg"><%= error %></p>
-    <% } %>
+  
 
     <form method="POST" action="/api/auth/login">
       <input type="email" class="form-control" name="email" placeholder="Email" required>

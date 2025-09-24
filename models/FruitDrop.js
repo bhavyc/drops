@@ -1,3 +1,4 @@
+ 
 const mongoose = require("mongoose");
 
 const fruitDropSchema = new mongoose.Schema({
@@ -7,7 +8,10 @@ const fruitDropSchema = new mongoose.Schema({
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   featured: { type: Boolean, default: false },
+  price: { type: Number, required: true }, 
+ discount: { type: Number, default: 0 }, // <-- discount in percent
   claimedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 module.exports = mongoose.model("Drop", fruitDropSchema);
+

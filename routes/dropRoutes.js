@@ -1,24 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const Drop = require("../models/FruitDrop");
-const mongoose = require("mongoose");
+const { protect,requireMembership} = require("../middleware/authMiddleware");
+const dropController = require("../controllers/dropController");
  
-const {
-  listDrops,
-  showDrop,
-  claimDrop,
-  showCreateDrop,
-  createDrop
-} = require("../controllers/dropController");
-const { protect } = require("../middleware/authMiddleware");
 
-// User routes
-router.get("/", protect, listDrops);
-router.get("/:id", protect, showDrop);
-router.post("/:id/claim", protect, claimDrop);
+// List all active drops
+router.get("/", protect, dropController.listDrops);
 
-// Admin routes
-// router.get("/admin/create", protect, showCreateDrop);
-// router.post("/admin/create", protect, createDrop);
+// Show single drop details
+router.get("/:id", protect, dropController.showDrop);
 
-module.exports = router;
+// Claim a drop
+router.post("/:id/claim", protect,requireMembership ,dropController.claimDrop);
+
+module.exports = router;git init 
