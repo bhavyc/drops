@@ -33,7 +33,7 @@
             <h5 class="card-title"><%= drop.title %></h5>
             <p class="card-text"><%= drop.description %></p>
             <p>
-              Price: 
+              Price:
               <% if(drop.finalPrice < drop.price){ %>
                 <span class="text-decoration-line-through">₹<%= drop.price %></span>
                 <span class="discount">₹<%= drop.finalPrice %></span>
@@ -56,21 +56,21 @@
     const token = "<%= user.token %>";
     const userId = "<%= user._id %>";
 
+    // Connect socket
     const socket = io();
-    socket.on("connect", () => {
-      socket.emit("joinRoom", { userId });
-    });
+    socket.emit("joinRoom", { userId }); // Join personal room
 
-    // Real-time claim update
+    // Listen for your own claim updates
     socket.on("claimUpdate", ({ dropId, message }) => {
-      const el = document.getElementById(`claimed-${dropId}`);
-      if(el) el.innerText = "Claimed!";
-      alert(message);
+      const btn = document.getElementById(`claimed-${dropId}`);
+      if(btn) btn.innerText = "Claimed!";
+      alert(message); // Only you see this
     });
 
+    // Claim drop
     const claimDrop = async (id) => {
       try {
-        const res = await fetch('/drops/claim/' + id, {
+        const res = await fetch('/drops/' + id + '/claim', {
           method: 'POST',
           headers: { 
             'Authorization': 'Bearer ' + token,
@@ -78,9 +78,12 @@
           }
         });
         const data = await res.json();
-        alert(data.message);
         if(data.success){
-          document.getElementById(`claimed-${id}`).innerText = "Claimed!";
+          const btn = document.getElementById(`claimed-${id}`);
+          if(btn) btn.innerText = "Claimed!";
+          alert(data.message);
+        } else {
+          alert(data.message);
         }
       } catch(err) {
         console.error(err);
@@ -88,6 +91,7 @@
       }
     }
 
+    // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('token');
       window.location.href = '/login';
@@ -96,8 +100,8 @@
     // Countdown timers
     const drops = <%- JSON.stringify(drops) %>;
     drops.forEach(drop => {
-      const endTime = new Date(drop.endTime).getTime();
       const countdownEl = document.getElementById(`countdown-${drop._id}`);
+      const endTime = new Date(drop.endTime).getTime();
 
       const interval = setInterval(() => {
         const now = new Date().getTime();

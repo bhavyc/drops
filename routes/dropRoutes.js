@@ -12,5 +12,5 @@ router.get("/:id", protect, dropController.showDrop);
 
 // Claim a drop
 router.post("/:id/claim", protect,requireMembership ,dropController.claimDrop);
-
-module.exports = router;git init 
+ 
+module.exports = router; 

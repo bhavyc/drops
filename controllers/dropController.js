@@ -102,32 +102,32 @@ exports.claimDrop = async (req, res) => {
     const user = req.user;
 
     if (!user.isMember || user.membershipExpiry < new Date()) {
-      return res.json({ success: false, message: "You need an active membership to claim this drop" });
+      return res.send("You need an active membership to claim this drop");
     }
 
     const dropId = req.params.id;
     const drop = await Drop.findById(dropId);
-    if (!drop) return res.json({ success: false, message: "Drop not found" });
+    if (!drop) return res.send("Drop not found");
 
     // Create claim
     try {
       await Claim.create({ user: user._id, drop: dropId });
     } catch (err) {
-      if (err.code === 11000) return res.json({ success: false, message: "You already claimed this drop" });
+      if (err.code === 11000) return res.send("You already claimed this drop");
       throw err;
     }
 
-    // Emit only to this user
+    // ✅ Emit only to this user
     const io = req.app.get("io");
     io.to(user._id.toString()).emit("claimUpdate", {
       dropId,
-      message: "You claimed this drop successfully!"
+      message: "You claimed this drop successfully!",
     });
 
-    res.json({ success: true, message: "Drop claimed!" });
+    res.redirect("/drops");
   } catch (err) {
     console.error("Claim error:", err);
-    res.json({ success: false, message: "Error claiming drop: " + err.message });
+    res.send("Error claiming drop: " + err.message);
   }
 };
 

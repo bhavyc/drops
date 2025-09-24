@@ -58,8 +58,8 @@
             <tr>
               <td><strong><%= drop.title %></strong></td>
               <td>₹<%= drop.price.toFixed(2) %></td>
-              <td><%= drop.startTime.toLocaleString() %></td>
-              <td><%= drop.endTime.toLocaleString() %></td>
+              <td><%= drop.startTime ? new Date(drop.startTime).toLocaleString() : 'N/A' %></td>
+              <td><%= drop.endTime ? new Date(drop.endTime).toLocaleString() : 'N/A' %></td>
               <td>
                 <% if(drop.featured) { %>
                   <span class="badge-featured">Yes</span>
