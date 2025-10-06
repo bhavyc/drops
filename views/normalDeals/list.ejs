@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🔥 Hot Deals</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Background Gradient + Animation */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #d0f0c0, #a8e6cf);
+      animation: bgMove 20s ease infinite;
+    }
+
+    @keyframes bgMove {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 900;
+      color: #1b5e20;
+      margin-bottom: 50px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+      font-size: 2.8rem;
+    }
+
+    /* Carousel Cards */
+    .carousel-item > .row {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    .card {
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+      position: relative;
+      background: #ffffffee;
+      perspective: 1000px;
+    }
+
+    .card:hover {
+      transform: translateY(-15px) scale(1.06);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .card-img-top {
+      height: 220px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .card:hover .card-img-top {
+      transform: scale(1.08) rotateZ(1deg);
+    }
+
+    /* Featured Badge */
+    .badge-featured {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: #aed581;
+      color: #1b5e20;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 50px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      animation: glow 1.5s infinite alternate;
+      z-index: 2;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 8px #aed581; }
+      to { box-shadow: 0 0 20px #7cb342; }
+    }
+
+    /* Price + Buttons */
+    .price {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+
+    .btn-buy {
+      background: linear-gradient(45deg, #43a047, #66bb6a);
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-buy:hover {
+      background: linear-gradient(45deg, #2e7d32, #388e3c);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .carousel-item .card { flex: 0 0 48%; margin: 0 auto; }
+    }
+    @media (max-width: 576px) {
+      .carousel-item .card { flex: 0 0 95%; margin: 0 auto; }
+    }
+
+    /* Carousel Controls */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      filter: invert(20%) sepia(100%) saturate(500%) hue-rotate(90deg);
+    }
+  </style>
+</head>
+<body class="container mt-5">
+
+  <h1>🔥 Hot Deals</h1>
+
+  <% if (deals.length === 0) { %>
+    <p class="text-center fs-5">No deals available right now.</p>
+  <% } else { %>
+    <div id="dealsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+      <div class="carousel-inner">
+        <% for(let i = 0; i < deals.length; i += 3) { %>
+          <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <div class="row">
+              <% deals.slice(i, i + 3).forEach(deal => { %>
+                <div class="col">
+                  <div class="card shadow">
+                    <% if(deal.featured) { %>
+                      <span class="badge-featured">🌟 Featured</span>
+                    <% } %>
+                    <% if(deal.image) { %>
+                      <img src="<%= deal.image %>" class="card-img-top" alt="<%= deal.title %>">
+                    <% } %>
+                    <div class="card-body text-center">
+                      <h5 class="card-title"><%= deal.title %></h5>
+                      <p class="card-text"><%= deal.description %></p>
+                      <p class="price">₹<%= deal.price %></p>
+                      <a href="#" class="btn btn-buy w-100">Buy Now</a>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#dealsCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#dealsCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  <% } %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

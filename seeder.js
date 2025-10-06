@@ -1,56 +1,69 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const Drop = require("./models/FruitDrop"); // apna path check karo
+const Deal = require("./models/Deal"); // make sure path is correct
 
-// DB Connection
-mongoose.connect("mongodb://localhost:27017/drop", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+// Connect DB
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/my_drops";
 
-const drops = [
-  {
-    title: "Fresh Mangoes",
-    description: "Get fresh Alphonso mangoes from Maharashtra.",
-    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",  
-    startTime: new Date("2025-09-15T10:00:00Z"),
-    endTime: new Date("2025-09-20T18:00:00Z"),
-    featured: true,
-    price: 499,
-    claimedBy: [],
-  },
-  {
-    title: "Organic Apples",
-    description: "Red delicious apples, straight from Himachal.",
-    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",  
-    startTime: new Date("2025-09-16T09:00:00Z"),
-    endTime: new Date("2025-09-22T20:00:00Z"),
-    featured: false,
-    price: 299,
-    claimedBy: [],
-  },
-  {
-    title: "Fresh Bananas",
-    description: "Sweet bananas from Kerala farms.",
-    image: "https://www.shutterstock.com/image-photo/fresh-mango-on-tree-garden-260nw-2617161019.jpg",    
-    startTime: new Date("2025-09-17T08:00:00Z"),
-    endTime: new Date("2025-09-23T19:00:00Z"),
-    featured: false,
-    price: 149,
-    claimedBy: [],
-  }
-];
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected..."))
+  .catch(err => console.error("DB connection error:", err));
 
-// Seed Function
-const seedDrops = async () => {
+async function seedDeals() {
   try {
-    await Drop.deleteMany(); // purane drops delete kar de (optional)
-    await Drop.insertMany(drops);
-    console.log("Drops seeded successfully!");
-    mongoose.disconnect();
-  } catch (err) {
-    console.log("Seeder error:", err);
-  }
-};
+    
+    await Deal.deleteMany({});
+    console.log("Old deals cleared ✅");
 
-seedDrops();
+    const now = new Date();
+    const deals = [
+      {
+        title: "Mango Deal",
+        description: "Fresh and juicy mangoes at 20% off!",
+        price: 100,
+        discount: 20,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDh6RmUj-ZuZw_77mK_iQzGxg1R46_hVjSxg&s",
+        startTime: now,
+        endTime: new Date(now.getTime() + 6 * 60 * 60 * 1000), // +6 hours
+        featured: true,
+      },
+      {
+        title: "Apple Deal",
+        description: "Crispy apples for your healthy snacks.",
+        price: 80,
+        discount: 10,
+        image: "https://www.collinsdictionary.com/images/full/apple_158989157.jpg",
+        startTime: now,
+        endTime: new Date(now.getTime() + 12 * 60 * 60 * 1000), // +12 hours
+      },
+      {
+        title: "Banana Deal",
+        description: "Sweet bananas at unbeatable prices.",
+        price: 50,
+        discount: 5,
+        image: "https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2018/08/bananas-1354785_1920.jpg",
+        startTime: now,
+        endTime: new Date(now.getTime() + 24 * 60 * 60 * 1000), // +1 day
+      },
+      // {
+      //   title: "Orange Deal",
+      //   description: "Fresh oranges for your vitamin C needs.",
+      //   price: 70,
+      //   discount: 15,
+      //   image: "https://via.placeholder.com/400x250.png?text=Orange",
+      //   startTime: now,
+      //   endTime: new Date(now.getTime() + 3 * 60 * 60 * 1000), // +3 hours
+      // }
+    ];
+
+    await Deal.insertMany(deals);
+    console.log("4 deals seeded successfully ✅");
+
+    mongoose.connection.close();
+  } catch (err) {
+    console.error("Seeder error:", err);
+    mongoose.connection.close();
+  }
+}
+
+seedDeals();

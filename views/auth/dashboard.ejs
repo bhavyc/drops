@@ -9,7 +9,7 @@
     body { background: #f1f5f9; min-height: 100vh; }
     .header { padding: 1rem; background: linear-gradient(to right,#a8e063,#56ab2f); color:#fff; display:flex; justify-content:space-between; align-items:center; }
     .card-drop { border-radius: 1rem; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.1); transition: transform 0.3s; position:relative;}
-    .card-drop:hover { transform: scale(1.05);}
+    .card-drop:hover { transform: scale(1.05); }
     .btn-claim { background: #56ab2f; border:none; }
     .btn-claim:hover { background:#3e8e41; }
     .discount { font-weight:bold; color:#d9534f; }
@@ -51,23 +51,11 @@
     </div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
   <script>
     const token = "<%= user.token %>";
     const userId = "<%= user._id %>";
 
-    // Connect socket
-    const socket = io();
-    socket.emit("joinRoom", { userId }); // Join personal room
-
-    // Listen for your own claim updates
-    socket.on("claimUpdate", ({ dropId, message }) => {
-      const btn = document.getElementById(`claimed-${dropId}`);
-      if(btn) btn.innerText = "Claimed!";
-      alert(message); // Only you see this
-    });
-
-    // Claim drop
+    
     const claimDrop = async (id) => {
       try {
         const res = await fetch('/drops/' + id + '/claim', {

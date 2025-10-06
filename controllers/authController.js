@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Claim = require("../models/Claim");
 const Drop = require("../models/FruitDrop");
 const JWT_SECRET = process.env.JWT_SECRET || "token";
+const Deal = require("../models/Deal");
 
 // Generate JWT
 const generateToken = (user) => {
@@ -63,17 +64,21 @@ console.log(user)
  
 exports.getProfile = async (req, res) => {
   try {
-    // Get all claims by this user and populate drop details
+    // Claimed drops (via Claim collection)
     const claims = await Claim.find({ user: req.user._id })
-                              .populate("drop")  // get full drop info
-                              .sort({ claimedAt: -1 }); // latest first
+                              .populate("drop")
+                              .sort({ claimedAt: -1 });
+    const claimedDrops = claims.filter(c => c.drop);
 
-    // Remove claims where drop is null
-    const validClaims = claims.filter(claim => claim.drop);
+    // Purchased deals (via Deal collection)
+    const purchasedDeals = await Deal.find({
+      claimedBy: req.user._id
+    }).sort({ createdAt: -1 });
 
     res.render("auth/profile", { 
       user: req.user,
-      claimedDrops: validClaims 
+      claimedDrops,
+      purchasedDeals
     });
   } catch (err) {
     console.error("Error fetching profile:", err);

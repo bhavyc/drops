@@ -3,103 +3,301 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile</title>
+  <title>User Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #d4f7d4, #a3e4a3);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      padding: 40px 20px;
+      color: #333;
     }
-    .profile-box {
-      background: white;
-      padding: 30px;
+
+    .profile-container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    /* Header Card */
+    .profile-header {
+      margin-bottom: 50px;
+    }
+
+    .header-card {
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
       border-radius: 20px;
-      box-shadow: 0px 4px 15px rgba(0, 128, 0, 0.2);
-      width: 100%;
-      max-width: 700px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      flex-wrap: wrap;
+      justify-content: space-between;
     }
-    h1 {
-      color: #2e7d32;
-      font-weight: bold;
-      margin-bottom: 15px;
+
+    .header-info h1 {
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: #1e3a8a;
     }
-    h2 {
-      color: #388e3c;
-      margin-top: 25px;
+
+    .header-info p {
+      margin: 0;
+      color: #333;
     }
-    .user-info {
-      background: #f1f8f1;
-      padding: 15px;
-      border-radius: 12px;
+
+    .badge-membership {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
+
+    .stats-box {
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 120px;
+    }
+
+    .stats-box div {
+      font-size: 1.1rem;
+      font-weight:600;
+      color:#1e3a8a;
+    }
+
+    .stats-box .number {
+      font-size: 1.6rem;
+      font-weight:700;
+      color: #fbbf24;
+      margin-top: 5px;
+    }
+
+    /* Card Sections */
+    .card-section {
+      background: #fff;
+      border-radius: 20px;
+      padding: 25px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 1.4rem;
       margin-bottom: 20px;
+      color: #1e3a8a;
+      position: relative;
     }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+
+    /* Scrollable Drop Lists - One item visible at a time */
+    .drop-list-wrapper {
+      height: 120px;       /* height of one item */
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      padding: 5px;
+      background: #f9fafb;
+    }
+
+    .drop-list-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .drop-list-wrapper::-webkit-scrollbar-thumb {
+      background: #fbbf24;
+      border-radius: 10px;
+    }
+
+    .drop-list-wrapper::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
     .drop-list {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
+
     .drop-list li {
-      background: #e8f5e9;
-      margin: 8px 0;
-      padding: 12px;
-      border-radius: 10px;
-      border-left: 5px solid #2e7d32;
+      background: #f9fafb;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border-left: 6px solid #fbbf24;
+      border-radius: 15px;
+      transition: transform 0.2s, background 0.2s;
+      scroll-snap-align: start; /* scroll snapping */
     }
-    .no-drops {
-      color: #777;
-      font-style: italic;
+
+    .drop-list li:hover {
+      transform: translateY(-3px);
+      background: #fff7ed;
     }
+
+    .drop-list li strong {
+      color: #1e3a8a;
+      font-size: 1.1rem;
+    }
+
+    .drop-list li small {
+      color: #555;
+    }
+
+    .btn-action {
+      border-radius: 50px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
     .btn-buy {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-left: 10px;
+    }
+
+    .btn-buy:hover {
+      background: linear-gradient(90deg, #f59e0b, #f97316);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    .btn-logout {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      color: #fff;
+      width: 100%;
       margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-logout:hover {
+      background: linear-gradient(90deg, #dc2626, #b91c1c);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    .no-drops {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    @media (max-width: 576px) {
+      .header-card { flex-direction: column; text-align: center; gap: 15px; }
+      .stats-box { min-width: 100%; display: flex; justify-content: space-around; margin-top:15px;}
+      .drop-list-wrapper { height: 100px; }
     }
   </style>
 </head>
 <body>
-  <div class="profile-box">
-    <h1>Welcome, <%= user.name %></h1>
+  <div class="profile-container">
 
-    <!-- User Info + Membership -->
-    <div class="user-info">
-      <p><strong>Email:</strong> <%= user.email %></p>
-      <p><strong>Membership:</strong> 
-        <% if(user.isMember){ %>
-          Active (expires on <%= user.membershipExpiry ? user.membershipExpiry.toLocaleDateString() : "N/A" %>)
-        <% } else { %>
-          Not Active
-          <form action="/membership/buy" method="POST" style="display:inline;">
-            <button class="btn btn-sm btn-success btn-buy">Buy Membership</button>
-          </form>
-        <% } %>
-      </p>
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="header-card">
+        <!-- Info -->
+        <div class="header-info" style="flex:1; min-width:200px;">
+          <h1><%= user.name %></h1>
+          <p><strong>Email:</strong> <%= user.email %></p>
+          <p>
+            <strong>Membership:</strong>
+            <% if(user.isMember){ %>
+              <span class="badge-membership">Active (expires on <%= user.membershipExpiry ? user.membershipExpiry.toLocaleDateString() : "N/A" %>)</span>
+            <% } else { %>
+              <span style="color:#f97316;">Not Active</span>
+              <form action="/membership/buy" method="POST" style="display:inline;">
+                <button class="btn-buy btn-action">Buy Membership</button>
+              </form>
+            <% } %>
+          </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-box">
+          <div>Total Claimed</div>
+          <div class="number"><%= claimedDrops.length %></div>
+          <div style="margin-top:8px;">Total Purchases</div>
+          <div class="number" style="color:#f59e0b;"><%= purchasedDeals.length %></div>
+        </div>
+      </div>
     </div>
 
     <!-- Claimed Drops -->
-    <h2>Claimed Drops</h2>
-    <% if(claimedDrops.length === 0){ %>
-      <p class="no-drops">You haven't claimed any drops yet.</p>
-    <% } else { %>
-      <ul class="drop-list">
-        <% claimedDrops.forEach(claim => { %>
-          <li>
-            <strong><%= claim.drop.title %></strong><br>
-            <%= claim.drop.description ? claim.drop.description : "" %><br>
-            <% if(user.isMember){ %>
-              Price: ₹<%= claim.drop.price %><br>
-            <% } %>
-            <small>Claimed at: <%= claim.claimedAt.toLocaleString() %></small>
-          </li>
-        <% }) %>
-      </ul>
-    <% } %>
+    <div class="card-section">
+      <div class="section-title">Claimed Drops</div>
+      <% if(!claimedDrops || claimedDrops.length === 0){ %>
+        <p class="no-drops">You haven't claimed any drops yet.</p>
+      <% } else { %>
+        <div class="drop-list-wrapper">
+          <ul class="drop-list">
+            <% claimedDrops.forEach(claim => { %>
+              <li>
+                <strong><%= claim.drop.title %></strong><br>
+                <%= claim.drop.description || "" %><br>
+                <% if(user.isMember){ %>
+                  Price: ₹<%= claim.drop.price %><br>
+                <% } %>
+                <small>Claimed at: <%= claim.claimedAt.toLocaleString() %></small>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Purchased Deals -->
+    <div class="card-section">
+      <div class="section-title">Purchased Deals</div>
+      <% if(!purchasedDeals || purchasedDeals.length === 0){ %>
+        <p class="no-drops">You haven't purchased any deals yet.</p>
+      <% } else { %>
+        <div class="drop-list-wrapper">
+          <ul class="drop-list">
+            <% purchasedDeals.forEach(deal => { %>
+              <li>
+                <strong><%= deal.title %></strong><br>
+                <%= deal.description || "" %><br>
+                <% if(user.isMember){ %>
+                  Price Paid: ₹<%= deal.price - (deal.price * deal.discount / 100) %><br>
+                <% } %>
+                <small>Claimed at: <%= deal.updatedAt.toLocaleString() %></small>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+    </div>
 
     <!-- Logout -->
-    <form action="/api/auth/logout" method="POST" class="mt-3">
-      <button class="btn btn-danger">Logout</button>
+    <form action="/api/auth/logout" method="POST">
+      <button class="btn-logout btn-action">Logout</button>
     </form>
+
   </div>
 </body>
 </html>

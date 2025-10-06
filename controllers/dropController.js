@@ -1,5 +1,6 @@
 const Drop = require("../models/FruitDrop");
 const Claim = require("../models/Claim");
+const Deal = require("../models/Deal");
 const dis=20;
 
 
@@ -34,7 +35,7 @@ exports.listDrops = async (req, res) => {
     console.error(err);
     res.send("Error: " + err.message);
   }
-};
+}; 
 
 // Show single drop details
 // Show single drop details

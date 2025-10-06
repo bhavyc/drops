@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
       background: linear-gradient(135deg, #d4f7d4, #a3e4a3);
@@ -45,6 +46,28 @@
     .btn-login:hover {
       background-color: #1b5e20;
     }
+    .btn-google {
+      background-color: #db4437;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      width: 100%;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s ease;
+      text-decoration: none;
+    }
+    .btn-google i {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+    .btn-google:hover {
+      background-color: #a33d2d;
+      text-decoration: none;
+      color: white;
+    }
     .error-msg {
       color: red;
       font-size: 14px;
@@ -62,15 +85,19 @@
 </head>
 <body>
   <div class="login-box">
-    <h1> Login</h1>
-    
-  
+    <h1>Login</h1>
 
+    <!-- Email/password login -->
     <form method="POST" action="/api/auth/login">
       <input type="email" class="form-control" name="email" placeholder="Email" required>
       <input type="password" class="form-control" name="password" placeholder="Password" required>
       <button type="submit" class="btn btn-login">Login</button>
     </form>
+
+    <!-- Google login -->
+    <a href="/auth/google" class="btn-google">
+      <i class="bi bi-google"></i> Login with Google
+    </a>
 
     <p class="mt-3">Don't have an account? <a href="/api/auth/register">Register</a></p>
   </div>
